@@ -1,0 +1,13 @@
+/* Add some basic styling to the card collection container */
+.container {
+    max-width: 800px;
+}
+
+table {
+    width: 100%;
+}
+
+th, td {
+    text-align: left;
+    vertical-align: middle;
+}

@@ -1,4 +1,7 @@
-const popReportURL = 'http://localhost:8080/api/popReports';
+popReportURL = 'http://localhost:8080/api/popReports';
+
+// create object with myCards
+let myCards = {};
 
 function getPopReports() {
     return fetch(popReportURL)
@@ -104,125 +107,224 @@ function renderSearchResults(searchResults) {
                 // If it does, add the card to the existing array for that set
                 searchResultsBySet.get(card.popReportName).push(card);
             } else {
-                // If it does not, create a new array for that set and add the card to it
+                // If it does not, create a new array for that set and add the card
                 searchResultsBySet.set(card.popReportName, [card]);
             }
         });
 
         // Loop through each set in the map
-        for (let [popReportName, setCards] of searchResultsBySet) {
-            // Create a heading for the set
-            let heading = `<h3>${popReportName}</h3>`;
+        for (let [setName, cards] of searchResultsBySet) {
+            // Create a table for the set
+            let table = createTable(cards);
 
-            // Create a table to display the set's cards
-            let table = `
-        <table class="table table-striped table-bordered">
-          <thead>
-            <tr>
-              <th>cardName</th>
-              <th>cardNumber</th>
-              <th>Variety</th>
-              <th>Grade1</th>
-              <th>Grade2</th>
-              <th>Grade3</th>
-              <th>Grade4</th>
-              <th>Grade5</th>
-              <th>Grade6</th>
-              <th>Grade7</th>
-              <th>Grade8</th>
-              <th>Grade9</th>
-              <th>Grade10</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
-            // Loop through each card in the set and add a row to the table for each card
-            setCards.forEach((card) => {
-                table += `
-                    <tr> 
-                        <td>${card.cardName}</td>
-                        <td>${card.cardNumber}</td>
-                        <td>${card.variety}</td>
-                        <td>${card.grade1}</td>
-                        <td>${card.grade2}</td>
-                        <td>${card.grade3}</td>
-                        <td>${card.grade4}</td>
-                        <td>${card.grade5}</td>
-                        <td>${card.grade6}</td>
-                        <td>${card.grade7}</td>
-                        <td>${card.grade8}</td>
-                        <td>${card.grade9}</td>
-                        <td>${card.grade10}</td>
-                        <td>${card.grade1 + card.grade2 + card.grade3 + card.grade4 + card.grade5 + card.grade6 + card.grade7 + card.grade8 + card.grade9 + card.grade10}</td>
-                         </tr>`
-                ;
-            });
-
-            table += '</tbody></table>';
-
-            // Add the heading and table to the container
-            container.innerHTML += heading + table;
+            // Add the set name and table to the container
+            container.innerHTML += `<h1>${setName}</h1>` + table;
         }
     } else {
-        // If there are no search results, display a message to the user
-        container.innerHTML = '<p>No search results found</p>';
+        // If there are no search results, display a message
+        container.innerHTML = '<p>No results found.</p>';
     }
 }
 
-function createTableRow(card) {
-    let total = 0;
-    for (let i = 1; i <= 10; i++) {
-        total += card[`grade${i}`];
-    }
-
-    return `
-    <tr>
-      <td>${card.cardName}</td>
-      <td>${card.cardNumber}</td>
-      <td>${card.variety}</td>
-      <td>${card.grade1}</td>
-      <td>${card.grade2}</td>
-      <td>${card.grade3}</td>
-      <td>${card.grade4}</td>
-      <td>${card.grade5}</td>
-      <td>${card.grade6}</td>
-      <td>${card.grade7}</td>
-      <td>${card.grade8}</td>
-      <td>${card.grade9}</td>
-      <td>${card.grade10}</td>
-      <td>${total}</td>
-    </tr>
-  `;
-}
 
 function createTable(cards) {
     let table = `
-    <table class="table table-striped table-bordered">
-      <thead>
-        <tr>
-          <th>cardName</th>
-          <th>cardNumber</th>
-          <th>Variety</th>
-          <th>Grade1</th>
-          <th>Grade2</th>
-          <th>Grade3</th>
-          <th>Grade4</th>
-          <th>Grade5</th>
-          <th>Grade6</th>
-          <th>Grade7</th>
-          <th>Grade8</th>
-          <th>Grade9</th>
-          <th>Grade10</th>
-          <th>Total</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Card Number</th>
+                    <th>Variety</th>
+                    <th>Grade 1</th>
+                    <th>Grade 2</th>
+                    <th>Grade 3</th>
+                    <th>Grade 4</th>
+                    <th>Grade 5</th>
+                    <th>Grade 6</th>
+                    <th>Grade 7</th>
+                    <th>Grade 8</th>
+                    <th>Grade 9</th>
+                    <th>Grade 10</th>                
+                    <th>My Grade</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    // Loop through each card and add a row to the table
     cards.forEach((card) => {
-        table += createTableRow(card);
+        table += `
+            <tr>
+                <td>${card.cardName}</td>
+                <td>${card.cardNumber}</td>
+                <td>${card.variety}</td>
+                <td>${card.grade1}</td>
+                <td>${card.grade2}</td>
+                <td>${card.grade3}</td>
+                <td>${card.grade4}</td>
+                <td>${card.grade5}</td>
+                <td>${card.grade6}</td>
+                <td>${card.grade7}</td>
+                <td>${card.grade8}</td>
+                <td>${card.grade9}</td>
+                <td>${card.grade10}</td>
+                <td>
+                    <select id="gradeSelect" class="dropdown">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                    </select>
+                </td>
+                <td>
+                    <button id="add-to-my-cards-button" class="btn-primary btn" data-id="${card.id}" data-cardname="${card.cardName}" data-cardnumber="${card.cardNumber}" data-cardvariety="${card.variety}">Add to My Cards</button>
+                </td>
+            </tr>
+        `;
     });
-    table += `</tbody></table>`;
+
+    table += `
+            </tbody>
+        </table>
+    `;
+
     return table;
 }
-document.addEventListener('DOMContentLoaded', getPopReports);
+
+document.addEventListener('click', function (event) {
+    if (event.target.id === 'add-to-my-cards-button') {
+        let cardId = event.target.getAttribute('data-id');
+        let cardName = event.target.getAttribute('data-cardname');
+        let cardNumber = event.target.getAttribute('data-cardnumber');
+        let cardVariety = event.target.getAttribute('data-cardvariety');
+        let gradeSelect = event.target.parentElement.previousElementSibling.querySelector('#gradeSelect');
+        let grade = gradeSelect.options[gradeSelect.selectedIndex].value;
+
+        addToMyCards(cardId, cardName, cardNumber, cardVariety, grade);
+    }
+});
+
+function addToMyCards(cardId, cardName, cardNumber, cardVariety, grade) {
+    // Check if the card already exists in the myCards object
+    if (myCards.hasOwnProperty(cardId)) {
+        // If it does, update the grade for the card
+        myCards[cardId].grades.push(grade);
+    } else {
+        // If it does not, add the card to the myCards object
+        myCards[cardId] = {
+            id: cardId,
+            cardName: cardName,
+            cardNumber: cardNumber,
+            variety: cardVariety,
+            grades: [grade]
+        };
+    }
+
+
+    // Convert the myCards object to a JSON string
+    let myCardsJson = JSON.stringify(myCards);
+
+    // Save the myCards object to local storage
+    localStorage.setItem('myCards', myCardsJson);
+
+    let event = new Event('myCardsChanged');
+    document.dispatchEvent(event);
+}
+
+function displayMyCards() {
+    let myCardsContainer = document.querySelector('#my-cards-container');
+
+    // Clear the container
+    myCardsContainer.innerHTML = '';
+
+    // Check if the myCards object is empty
+    if (Object.keys(myCards).length === 0) {
+        //check if the localStorage myCards is empty
+        if (localStorage.getItem('myCards') === null) {
+            myCardsContainer.innerHTML = '<p>You have no cards in your collection.</p>';
+        }
+    } else {
+        // Create a table to display the cards
+        let table = document.createElement('table');
+        table.classList.add('table');
+
+        // Add the table header row
+        table.innerHTML = `
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Card Number</th>
+                    <th scope="col">Variety</th>
+                    <th scope="col">Grades</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        `;
+
+        // Loop through each card in the myCards object
+        for (let cardId in myCards) {
+            let card = myCards[cardId];
+
+            // Create the table row element
+            let row = document.createElement('tr');
+
+            // Add the card name, card number, and variety to the row
+            row.innerHTML = `
+                <td>${card.cardName}</td>
+                <td>${card.cardNumber}</td>
+                <td>${card.variety}</td>
+            `;
+
+            // Create a td element to display the grades
+            let gradesTd = document.createElement('td');
+
+            // Get the list of grades as a comma-separated string
+            let gradesString = card.grades.join(', ');
+
+            // Set the innerHTML of the td element to the grades string
+            gradesTd.innerHTML = gradesString;
+
+            // Append the td element to the row
+            row.appendChild(gradesTd);
+
+            // Add a button to the row to remove the card from the myCards object
+
+            let button = document.createElement('button');
+            button.classList.add('btn', 'btn-danger');
+            button.innerHTML = 'Remove';
+            button.addEventListener('click', function () {
+                // Remove the card from the myCards object
+                delete myCards[cardId];
+
+                // Re-display the myCards table
+                displayMyCards();
+            });
+            row.appendChild(button);
+
+            // Append the row to the table body
+            table.querySelector('tbody').appendChild(row);
+        }
+
+        // Add the table to the container
+        myCardsContainer.appendChild(table);
+    }
+}
+
+
+document.addEventListener('myCardsChanged', function () {
+    displayMyCards();
+});
+
+
+
+
+
+
